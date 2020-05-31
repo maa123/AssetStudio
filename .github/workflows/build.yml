@@ -55,12 +55,6 @@ jobs:
     runs-on: windows-latest  # For a list of available runner types, refer to 
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
-    env:
-      Solution_Name: AssetStudio.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
-      Test_Project_Path: your-test-project-path                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-      Wap_Project_Directory: your-wap-project-directory-name    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
-      Wap_Project_Path: your-wap-project-path                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
-
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -69,7 +63,8 @@ jobs:
 
     # Install the .NET Core workload
     - name: Setup nuget
-    - uses: warrenbuckley/Setup-Nuget@v1
+      uses: warrenbuckley/Setup-Nuget@v1
+    
     - run: nuget restore
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
@@ -77,11 +72,12 @@ jobs:
       uses: microsoft/setup-msbuild@2008f912f56e61277eefaac6d1888b750582aa16
     
     - name: FBXSDK
-    - run: md fbx
-    - run: cd fbx
-    - run: Start-FileDownload "https://damassets.autodesk.net/content/dam/autodesk/www/adn/fbx/2020-0-1/fbx202001_fbxsdk_vs2017_win.exe" "fbxsdk.exe"
-    - run: Start-Process -FilePath "fbxsdk.exe" /S -Wait
-    - run: cd ..
+      steps: 
+        - run: md fbx
+        - run: cd fbx
+        - run: Start-FileDownload "https://damassets.autodesk.net/content/dam/autodesk/www/adn/fbx/2020-0-1/fbx202001_fbxsdk_vs2017_win.exe" "fbxsdk.exe"
+        - run: Start-Process -FilePath "fbxsdk.exe" /S -Wait
+        - run: cd ..
 
     - name: Build
       run: msbuild AssetStudio.sln /p:Configuration=$env.Configuration /p:Platform=x64 /p:AllowedReferenceRelatedFileExtensions=".pdb"
