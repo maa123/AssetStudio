@@ -92,4 +92,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: AssetStudio
-        path: $Env:GITHUB_WORKSPACE\AssetStudioGUI\bin\
+        path: AssetStudioGUI\bin\
