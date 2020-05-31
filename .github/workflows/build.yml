@@ -83,7 +83,7 @@ jobs:
       shell: powershell
 
     - name: Build
-      run: msbuild AssetStudio.sln /p:Configuration=$env.Configuration /p:Platform=x64 /p:AllowedReferenceRelatedFileExtensions=".pdb"
+      run: msbuild AssetStudio.sln /p:Configuration=$env.Configuration /p:Platform="Any CPU" /p:AllowedReferenceRelatedFileExtensions=".pdb"
       env:
         Configuration: ${{ matrix.configuration }}
 
@@ -92,4 +92,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: AssetStudio
-        path: $Env:GITHUB_WORKSPACE\AssetStudioGUI\bin\x64
+        path: $Env:GITHUB_WORKSPACE\AssetStudioGUI\bin\
