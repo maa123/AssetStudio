@@ -77,7 +77,7 @@ jobs:
         cd fbx
         $cli = New-Object System.Net.WebClient
         $uri = New-Object System.Uri("https://damassets.autodesk.net/content/dam/autodesk/www/adn/fbx/2020-0-1/fbx202001_fbxsdk_vs2017_win.exe")
-        $cli.DownloadFile($uri, "fbxsdk.exe")
+        $cli.DownloadFile($uri, (Join-Path "$Env:GITHUB_WORKSPACE" "fbxsdk.exe"))
         Start-Process -FilePath "fbxsdk.exe" /S -Wait
         cd ..
       shell: powershell
