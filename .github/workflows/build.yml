@@ -83,7 +83,7 @@ jobs:
       shell: powershell
 
     - name: Build
-      run: msbuild AssetStudio.sln /p:Configuration=$env.Configuration /p:AllowedReferenceRelatedFileExtensions=".pdb"
+      run: msbuild AssetStudio.sln /p:AllowedReferenceRelatedFileExtensions=".pdb"
       env:
         Configuration: ${{ matrix.configuration }}
 
