@@ -72,12 +72,12 @@ jobs:
       uses: microsoft/setup-msbuild@2008f912f56e61277eefaac6d1888b750582aa16
     
     - name: FBXSDK
-      steps: 
-        - run: md fbx
-        - run: cd fbx
-        - run: Start-FileDownload "https://damassets.autodesk.net/content/dam/autodesk/www/adn/fbx/2020-0-1/fbx202001_fbxsdk_vs2017_win.exe" "fbxsdk.exe"
-        - run: Start-Process -FilePath "fbxsdk.exe" /S -Wait
-        - run: cd ..
+      run: |
+        md fbx
+        cd fbx
+        Start-FileDownload "https://damassets.autodesk.net/content/dam/autodesk/www/adn/fbx/2020-0-1/fbx202001_fbxsdk_vs2017_win.exe" "fbxsdk.exe"
+        Start-Process -FilePath "fbxsdk.exe" /S -Wait
+        cd ..
 
     - name: Build
       run: msbuild AssetStudio.sln /p:Configuration=$env.Configuration /p:Platform=x64 /p:AllowedReferenceRelatedFileExtensions=".pdb"
