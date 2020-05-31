@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,13 +11,16 @@ namespace AssetStudio
     {
         public static void ReadTypeString(StringBuilder sb, List<TypeTreeNode> members, BinaryReader reader)
         {
+            var jo = new Dictionary<string, object>();
             for (int i = 0; i < members.Count; i++)
             {
-                ReadStringValue(sb, members, reader, ref i);
+                ReadStringValue(ref jo, sb, members, reader, ref i);
             }
+            //sb.AppendLine(JsonConvert.SerializeObject(jo, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
+            sb.AppendLine(JObject.FromObject(jo).ToString());
         }
 
-        private static void ReadStringValue(StringBuilder sb, List<TypeTreeNode> members, BinaryReader reader, ref int i)
+        private static void ReadStringValue(ref Dictionary<string, object> jo, StringBuilder sb, List<TypeTreeNode> members, BinaryReader reader, ref int i)
         {
             var member = members[i];
             var level = member.m_Level;
@@ -72,7 +76,7 @@ namespace AssetStudio
                 case "string":
                     append = false;
                     var str = reader.ReadAlignedString();
-                    sb.AppendFormat("{0}{1} {2} = \"{3}\"\r\n", (new string('\t', level)), varTypeStr, varNameStr, str);
+                    jo[varNameStr] =  str;
                     i += 3;
                     break;
                 case "map":
@@ -80,24 +84,24 @@ namespace AssetStudio
                         if ((members[i + 1].m_MetaFlag & 0x4000) != 0)
                             align = true;
                         append = false;
-                        sb.AppendFormat("{0}{1} {2}\r\n", (new string('\t', level)), varTypeStr, varNameStr);
-                        sb.AppendFormat("{0}{1} {2}\r\n", (new string('\t', level + 1)), "Array", "Array");
                         var size = reader.ReadInt32();
-                        sb.AppendFormat("{0}{1} {2} = {3}\r\n", (new string('\t', level + 1)), "int", "size", size);
                         var map = GetMembers(members, i);
                         i += map.Count - 1;
                         var first = GetMembers(map, 4);
                         var next = 4 + first.Count;
                         var second = GetMembers(map, next);
+                        Dictionary<string, object>[] nmap = new Dictionary<string, object>[size * 2];
                         for (int j = 0; j < size; j++)
                         {
-                            sb.AppendFormat("{0}[{1}]\r\n", (new string('\t', level + 2)), j);
-                            sb.AppendFormat("{0}{1} {2}\r\n", (new string('\t', level + 2)), "pair", "data");
                             int tmp1 = 0;
                             int tmp2 = 0;
-                            ReadStringValue(sb, first, reader, ref tmp1);
-                            ReadStringValue(sb, second, reader, ref tmp2);
+                            nmap[j] = new Dictionary<string, object>();
+                            nmap[j + 1] = new Dictionary<string, object>();
+                            ReadStringValue(ref nmap[j], sb, first, reader, ref tmp1);
+                            ReadStringValue(ref nmap[j + 1], sb, second, reader, ref tmp2);
                         }
+                        nmap = nmap.Where(c => c != null).ToArray();
+                        jo[varNameStr] = nmap;
                         break;
                     }
                 case "TypelessData":
@@ -106,8 +110,7 @@ namespace AssetStudio
                         var size = reader.ReadInt32();
                         reader.ReadBytes(size);
                         i += 2;
-                        sb.AppendFormat("{0}{1} {2}\r\n", (new string('\t', level)), varTypeStr, varNameStr);
-                        sb.AppendFormat("{0}{1} {2} = {3}\r\n", (new string('\t', level)), "int", "size", size);
+                        jo[varNameStr] = size;
                         break;
                     }
                 default:
@@ -117,36 +120,39 @@ namespace AssetStudio
                             if ((members[i + 1].m_MetaFlag & 0x4000) != 0)
                                 align = true;
                             append = false;
-                            sb.AppendFormat("{0}{1} {2}\r\n", (new string('\t', level)), varTypeStr, varNameStr);
-                            sb.AppendFormat("{0}{1} {2}\r\n", (new string('\t', level + 1)), "Array", "Array");
                             var size = reader.ReadInt32();
-                            sb.AppendFormat("{0}{1} {2} = {3}\r\n", (new string('\t', level + 1)), "int", "size", size);
+                            Dictionary<string, object>[] arr = new Dictionary<string, object>[size];
                             var vector = GetMembers(members, i);
                             i += vector.Count - 1;
                             for (int j = 0; j < size; j++)
                             {
-                                sb.AppendFormat("{0}[{1}]\r\n", (new string('\t', level + 2)), j);
                                 int tmp = 3;
-                                ReadStringValue(sb, vector, reader, ref tmp);
+                                arr[j] = new Dictionary<string, object>();
+                                ReadStringValue(ref arr[j], sb, vector, reader, ref tmp);
                             }
+                            arr = arr.Where(c => c != null).ToArray();
+                            jo[varNameStr] = arr;
                             break;
                         }
                         else //Class
                         {
                             append = false;
-                            sb.AppendFormat("{0}{1} {2}\r\n", (new string('\t', level)), varTypeStr, varNameStr);
                             var @class = GetMembers(members, i);
                             i += @class.Count - 1;
+                            Dictionary<string, object>[] cls = new Dictionary<string, object>[@class.Count - 1];
                             for (int j = 1; j < @class.Count; j++)
                             {
-                                ReadStringValue(sb, @class, reader, ref j);
+                                cls[j - 1] = new Dictionary<string, object>();
+                                ReadStringValue(ref cls[j - 1], sb, @class, reader, ref j);
                             }
+                            cls = cls.Where(c => c != null).ToArray();
+                            jo[varNameStr] = cls;
                             break;
                         }
                     }
             }
-            if (append)
-                sb.AppendFormat("{0}{1} {2} = {3}\r\n", (new string('\t', level)), varTypeStr, varNameStr, value);
+            if (append && value != null)
+                jo[varNameStr] = value;
             if (align)
                 reader.AlignStream();
         }
