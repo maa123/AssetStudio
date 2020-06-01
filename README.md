@@ -5,8 +5,10 @@
 
 ## ビルドに必要なもの
 
-Visual Studio 2019
-[FBX SDK 2020.0.1](https://www.autodesk.com/developer-network/platform-technologies/fbx-sdk-2020-0)
+- Visual Studio 2019
+- [FBX SDK 2020.0.1](https://www.autodesk.com/developer-network/platform-technologies/fbx-sdk-2020-0)
+
+
 2020.0.1 VS2017をダウンロード、インストールしてください。
 
 AssetStudio.slnを開いて、ビルド->ソリューションのビルド　でビルドできます。
