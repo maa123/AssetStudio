@@ -1,4 +1,18 @@
 # AssetStudio
+
+
+![Build](https://github.com/maa123/AssetStudio/workflows/Build/badge.svg)
+
+## ビルドに必要なもの
+
+Visual Studio 2019
+[FBX SDK 2020.0.1](https://www.autodesk.com/developer-network/platform-technologies/fbx-sdk-2020-0)
+2020.0.1 VS2017をダウンロード、インストールしてください。
+
+AssetStudio.slnを開いて、ビルド->ソリューションのビルド　でビルドできます。
+
+
+
 [![Build status](https://ci.appveyor.com/api/projects/status/rnu7l90422pdewx4?svg=true)](https://ci.appveyor.com/project/Perfare/assetstudio/branch/master/artifacts)
 
 **None of the repo, the tool, nor the repo owner is affiliated with, or sponsored or authorized by, Unity Technologies or its affiliates.**
