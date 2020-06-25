@@ -120,7 +120,7 @@ namespace AssetStudio
             }
         }
 
-        private void LoadAssetsFromMemory(string fullName, EndianBinaryReader reader, string originalPath, string unityVersion = null)
+        private void LoadAssetsFromMemory(string fullName, EndianBinaryReader reader, string originalPath, string unityVersion = null, bool singleFile = false)
         {
             var fileName = Path.GetFileName(fullName);
             if (!assetsFileListHash.Contains(fileName))
@@ -128,6 +128,9 @@ namespace AssetStudio
                 try
                 {
                     var assetsFile = new SerializedFile(this, fullName, reader);
+                    if (singleFile) {
+                        assetsFile.singleFile = true;
+                    }
                     assetsFile.originalPath = originalPath;
                     if (assetsFile.header.m_Version < 7)
                     {
@@ -157,7 +160,10 @@ namespace AssetStudio
                     if (SerializedFile.IsSerializedFile(subReader))
                     {
                         var dummyPath = Path.GetDirectoryName(fullName) + Path.DirectorySeparatorChar + file.fileName;
-                        LoadAssetsFromMemory(dummyPath, subReader, parentPath ?? fullName, bundleFile.m_Header.unityRevision);
+                        if(bundleFile.fileList.Length == 1) {
+                            dummyPath = fullName;
+                        }
+                        LoadAssetsFromMemory(dummyPath, subReader, parentPath ?? fullName, bundleFile.m_Header.unityRevision, (bundleFile.fileList.Length == 1) );
                     }
                     else
                     {

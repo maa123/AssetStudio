@@ -11,6 +11,7 @@ namespace AssetStudio
         public AssetsManager assetsManager;
         public EndianBinaryReader reader;
         public string fullName;
+        public bool singleFile = false;
         public string originalPath;
         public string fileName;
         public int[] version = { 0, 0, 0, 0 };

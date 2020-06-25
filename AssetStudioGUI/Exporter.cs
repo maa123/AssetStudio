@@ -129,7 +129,7 @@ namespace AssetStudioGUI
 
         public static bool ExportMonoBehaviour(AssetItem item, string exportPath)
         {
-            var exportFullName = exportPath + item.Text + ".txt";
+            var exportFullName = exportPath + item.Text + ".json";
             if (ExportFileExists(exportFullName))
                 return false;
             var m_MonoBehaviour = (MonoBehaviour)item.Asset;

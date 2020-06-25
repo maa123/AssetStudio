@@ -168,6 +168,9 @@ namespace AssetStudioGUI
                             {
                                 assetItem.Text = m_MonoBehaviour.m_Name;
                             }
+                            if (assetsFile.singleFile) {
+                                assetItem.Text = assetsFile.fileName;
+                            }
                             exportable = true;
                             break;
                         case PlayerSettings m_PlayerSettings:
